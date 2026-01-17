@@ -5,17 +5,23 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    # Runs every night at 2 AM UTC (adjust as needed)
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
 
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Run ZAP Full Scan (latest Action)
       - name: Run ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.7.0
         with:
@@ -26,15 +32,13 @@ jobs:
           issue_title: ZAP Full Scan Report
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 3: Create a safe folder for reports
       - name: Prepare Report Folder
         run: |
           mkdir -p zap_reports
           mv report_json.json report_md.md report_html.html zap_reports/ || echo "Reports not found"
 
-      # Step 4: Upload reports as artifacts with a valid name
       - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         with:
-          name: zap_reports  # valid artifact name: letters and underscore only
+          name: zap-reports
           path: zap_reports/
