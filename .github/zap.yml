@@ -12,12 +12,12 @@ env:
         parameters:
           loginPageUrl: "https://juice-shop.herokuapp.com/#/login"
           loginRequestUrl: "https://juice-shop.herokuapp.com/rest/user/login"
-          loginRequestData: '{"email":"test@test.com ","password":"Test123"}'
+          loginRequestData: '{"email":"test@test.com","password":"Test123"}'
         verification:
           loggedInRegex: "Logout"
           loggedOutRegex: "Login"
       users:
-        - name: "test"
+        - name: "testuser"
           credentials:
             email: "test@test.com"
             password: "Test123"
@@ -26,5 +26,9 @@ jobs:
   - type: spider
     parameters:
       context: "JuiceShop"
-      user: "test"
+      user: "testuser"
   - type: passiveScan
+  - type: activeScan
+    parameters:
+      context: "JuiceShop"
+      user: "testuser"
