@@ -21,11 +21,12 @@ jobs:
       - name: Pull ZAP GHCR Image
         run: docker pull ghcr.io/zaproxy/zaproxy:stable
 
-      - name: Run ZAP Full Scan
+      - name: Run ZAP Full Scan (Demo Test Fire)
         run: |
-          docker run --rm -v $PWD/zap_reports:/zap/wrk \
+          docker run --rm -v $PWD:/zap/wrk \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-full-scan.py -t https://juice-shop.herokuapp.com \
+            zap-full-scan.py -t https://demo.testfire.net \
+            -c /zap/wrk/zap.yml \
             -J /zap/wrk/report.json -w /zap/wrk/report.md -r /zap/wrk/report.html
 
       - name: Upload ZAP Reports
