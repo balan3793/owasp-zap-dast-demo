@@ -21,7 +21,3 @@ jobs:
         with:
           target: https://juice-shop.herokuapp.com
           cmd_options: -c /zap/wrk/zap.yml
-          fail_action: false
-          allow_issue_writing: true
-          issue_title: ZAP Full Scan Report
-          token: ${{ secrets.GITHUB_TOKEN }}
