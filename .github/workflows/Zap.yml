@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  issues: write  # ✅ This line gives permission to create issues
+  issues: write
 
 jobs:
   zap_scan:
@@ -18,3 +18,4 @@ jobs:
         with:
           target: 'http://testphp.vulnweb.com'
           cmd_options: '-a'
+          artifact_name: 'zap-results'
