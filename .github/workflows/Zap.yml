@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  issues: write   # allow ZAP to create issues
+  issues: write
 
 jobs:
   zap_job:
@@ -14,11 +14,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: OWASP ZAP Baseline Scan
+      - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: 'https://juice-shop.herokuapp.com'
           cmd_options: '-a'
-          artifact_name: ''
-          allow_issue_writing: true
           fail_action: false
+          allow_issue_writing: false
