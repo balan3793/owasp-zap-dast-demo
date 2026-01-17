@@ -1,4 +1,4 @@
-name: Authenticated OWASP ZAP Scan
+name: Authenticated OWASP ZAP Full Scan
 
 on:
   workflow_dispatch:
@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Run ZAP Full Scan with Auth
+      - name: Run ZAP Full Scan with Auth Cookie
         uses: zaproxy/action-full-scan@v0.4.0
         with:
           target: 'https://juice-shop.herokuapp.com'
@@ -27,4 +27,3 @@ jobs:
             -config replacer.full_list(0).replacement=token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MjUsInVzZXJuYW1lIjoiIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicGFzc3dvcmQiOiI2OGVhY2I5N2Q4NmYwYzQ2MjFmYTJiMGUxN2NhYmQ4YyIsInJvbGUiOiJjdXN0b21lciIsImRlbHV4ZVRva2VuIjoiIiwibGFzdExvZ2luSXAiOiIwLjAuMC4wIiwicHJvZmlsZUltYWdlIjoiL2Fzc2V0cy9wdWJsaWMvaW1hZ2VzL3VwbG9hZHMvZGVmYXVsdC5zdmciLCJ0b3RwU2VjcmV0IjoiIiwiaXNBY3RpdmUiOnRydWUsImNyZWF0ZWRBdCI6IjIwMjYtMDEtMTcgMDg6MDc6MjIuNTQ3ICswMDowMCIsInVwZGF0ZWRBdCI6IjIwMjYtMDEtMTcgMDg6MDc6MjIuNTQ3ICswMDowMCIsImRlbGV0ZWRBdCI6bnVsbH0sImlhdCI6MTc2ODYzNzI1N30.QnZA_rnhj_j_tYgxbKrAdVxTCj_FDBuK_viP3kHIRI_uk7BV2sCg7kFzIs6dTo6TC8_iFOHWPQSRQLo57GmUuD01RA3Dd7e9Cw_ufGWT2z9n4UUTnr4-366sIUC8ibK17v0yCeo701SpzSsTLzhIqqo64hpLGH4vReAsk3wTQAI"
           fail_action: false
           allow_issue_writing: false
-          artifact_name: 'zap_auth_report'
