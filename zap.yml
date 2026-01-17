@@ -15,6 +15,7 @@ env:
           loginRequestData: "username=admin&password=admin&btnSubmit=Login"
         verification:
           method: poll
+          pollUrl: "https://demo.testfire.net/bank/main.jsp"
           pollFrequency: 2
           pollUnits: requests
           loggedInRegex: "Log Out"
