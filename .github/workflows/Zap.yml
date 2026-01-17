@@ -1,34 +1,35 @@
-name: OWASP ZAP Full Scan (GHCR)
+name: OWASP ZAP Authenticated Scan (Demo Test Fire)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # allows manual trigger
+  schedule:
+    - cron: "0 2 * * *"   # optional: run nightly at 2 AM UTC
 
 permissions:
   contents: read
-  actions: write  # required to upload artifacts
+  actions: write   # required to upload artifacts
 
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Step 2: Prepare reports folder
       - name: Prepare Reports Folder
         run: mkdir -p zap_reports
 
-      - name: Pull ZAP GHCR Image
-        run: docker pull ghcr.io/zaproxy/zaproxy:stable
-
-      - name: Run ZAP Full Scan (Demo Test Fire)
+      # Step 3: Run ZAP Authenticated Scan using automation plan
+      - name: Run ZAP Authenticated Scan
         run: |
           docker run --rm -v $PWD:/zap/wrk \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-full-scan.py -t https://demo.testfire.net \
-            -c /zap/wrk/zap.yml \
-            -J /zap/wrk/report.json -w /zap/wrk/report.md -r /zap/wrk/report.html
+            zap.sh -autorun /zap/wrk/zap.yml
 
+      # Step 4: Upload reports as artifacts
       - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         with:
