@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
   actions: write
-  issues: write   # needed if you want ZAP to open GitHub issues
+  issues: write
 
 jobs:
   zap_scan:
@@ -21,3 +21,7 @@ jobs:
         with:
           target: https://juice-shop.herokuapp.com
           cmd_options: -c /zap/wrk/zap.yml
+          fail_action: false
+          allow_issue_writing: true
+          issue_title: ZAP Full Scan Report
+          token: ${{ secrets.GITHUB_TOKEN }}
