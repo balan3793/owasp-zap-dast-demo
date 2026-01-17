@@ -1,7 +1,7 @@
 name: OWASP ZAP Authenticated Scan (Demo Test Fire)
 
 on:
-  workflow_dispatch:   # allows manual trigger
+  workflow_dispatch:   # manual trigger
   schedule:
     - cron: "0 2 * * *"   # optional: run nightly at 2 AM UTC
 
@@ -27,7 +27,7 @@ jobs:
         run: |
           docker run --rm -v $PWD:/zap/wrk \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap.sh -autorun /zap/wrk/zap.yml
+            zap.sh -daemon -autorun /zap/wrk/zap.yml
 
       # Step 4: Upload reports as artifacts
       - name: Upload ZAP Reports
