@@ -18,4 +18,4 @@ jobs:
         with:
           target: 'http://testphp.vulnweb.com'
           cmd_options: '-a'
-          artifact_name: 'zap_results_artifact'
+          upload_artifact: false
