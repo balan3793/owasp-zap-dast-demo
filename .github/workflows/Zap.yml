@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout your repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Run ZAP Full Scan
+      # Step 2: Run ZAP Full Scan using latest Action (no Docker Hub required)
       - name: Run ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.4.0
+        uses: zaproxy/action-full-scan@v0.6.0
         with:
           target: https://juice-shop.herokuapp.com
           cmd_options: -c /zap/wrk/zap.yml
