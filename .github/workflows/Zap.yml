@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  issues: write  # Allows ZAP to create GitHub issues if alerts are found
+  issues: write
 
 jobs:
-  zap_scan:
+  zap_job:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +19,6 @@ jobs:
         with:
           target: 'http://testphp.vulnweb.com'
           cmd_options: '-a'
-          allow_issue_writing: true  # Optional: lets ZAP create issues if alerts are found
-          fail_action: false         # Optional: prevents workflow from failing on alerts
+          artifact_name: 'zapresults123'
+          allow_issue_writing: true
+          fail_action: false
