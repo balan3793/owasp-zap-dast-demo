@@ -34,3 +34,22 @@ jobs:
     parameters:
       context: "TestFire"
       user: "adminuser"
+
+  - type: report
+    parameters:
+      template: traditional-html
+      reportFile: /zap/wrk/report.html
+      reportDir: /zap/wrk
+      reportTitle: "Demo Test Fire Authenticated Scan"
+  - type: report
+    parameters:
+      template: traditional-json
+      reportFile: /zap/wrk/report.json
+      reportDir: /zap/wrk
+      reportTitle: "Demo Test Fire Authenticated Scan"
+  - type: report
+    parameters:
+      template: traditional-md
+      reportFile: /zap/wrk/report.md
+      reportDir: /zap/wrk
+      reportTitle: "Demo Test Fire Authenticated Scan"
