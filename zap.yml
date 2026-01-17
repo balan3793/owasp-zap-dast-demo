@@ -14,7 +14,9 @@ env:
           loginRequestUrl: "https://demo.testfire.net/login.jsp"
           loginRequestData: "username=admin&password=admin&btnSubmit=Login"
         verification:
-          method: regex
+          method: poll
+          pollFrequency: 2
+          pollUnits: requests
           loggedInRegex: "Log Out"
           loggedOutRegex: "Sign In"
       users:
@@ -28,8 +30,6 @@ jobs:
     parameters:
       context: "TestFire"
       user: "adminuser"
-
-  - type: passiveScan
 
   - type: activeScan
     parameters:
