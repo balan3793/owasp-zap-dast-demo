@@ -1,34 +1,39 @@
 env:
   contexts:
-    - name: "JuiceShop"
+    - name: "TestFire"
       urls:
-        - "https://juice-shop.herokuapp.com"
+        - "https://demo.testfire.net"
       includePaths:
-        - "https://juice-shop.herokuapp.com.*"
+        - "https://demo.testfire.net.*"
       excludePaths:
-        - "https://juice-shop.herokuapp.com/logout.*"
+        - "https://demo.testfire.net/logout.*"
       authentication:
         method: form
         parameters:
-          loginPageUrl: "https://juice-shop.herokuapp.com/#/login"
-          loginRequestUrl: "https://juice-shop.herokuapp.com/rest/user/login"
-          loginRequestData: '{"email":"test@test.com","password":"Test123"}'
+          loginPageUrl: "https://demo.testfire.net/login.jsp"
+          loginRequestUrl: "https://demo.testfire.net/login.jsp"
+          loginRequestData: "username=admin&password=admin&btnSubmit=Login"
         verification:
-          loggedInRegex: "Logout"
-          loggedOutRegex: "Login"
+          loggedInRegex: "Log Out"
+          loggedOutRegex: "Sign In"
       users:
-        - name: "testuser"
+        - name: "adminuser"
           credentials:
-            email: "test@test.com"
-            password: "Test123"
+            username: "admin"
+            password: "admin"
 
 jobs:
+  # Crawl the site as the admin user
   - type: spider
     parameters:
-      context: "JuiceShop"
-      user: "testuser"
+      context: "TestFire"
+      user: "adminuser"
+
+  # Passive scan (checks traffic for vulnerabilities)
   - type: passiveScan
+
+  # Active scan (attacks endpoints to find issues)
   - type: activeScan
     parameters:
-      context: "JuiceShop"
-      user: "testuser"
+      context: "TestFire"
+      user: "adminuser"
