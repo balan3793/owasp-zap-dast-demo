@@ -1,0 +1,36 @@
+env:
+  contexts:
+    - name: "TestFire"
+      urls:
+        - "https://demo.testfire.net"
+      includePaths:
+        - "https://demo.testfire.net.*"
+      excludePaths:
+        - "https://demo.testfire.net/logout.*"
+      authentication:
+        method: form
+        parameters:
+          loginPageUrl: "https://demo.testfire.net/login.jsp"
+          loginRequestUrl: "https://demo.testfire.net/login.jsp"
+          loginRequestData: "username=admin&password=admin&btnSubmit=Login"
+        verification:
+          loggedInRegex: "Log Out"
+          loggedOutRegex: "Sign In"
+      users:
+        - name: "adminuser"
+          credentials:
+            username: "admin"
+            password: "admin"
+
+jobs:
+  - type: spider
+    parameters:
+      context: "TestFire"
+      user: "adminuser"
+
+  - type: passiveScan
+
+  - type: activeScan
+    parameters:
+      context: "TestFire"
+      user: "adminuser"
