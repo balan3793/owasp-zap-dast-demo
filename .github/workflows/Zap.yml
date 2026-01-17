@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout your repository
+      # Step 1: Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Run ZAP Full Scan using latest Action (no Docker Hub required)
+      # Step 2: Run ZAP Full Scan (latest Action, no Docker Hub needed)
       - name: Run ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.6.0
         with:
@@ -26,7 +26,7 @@ jobs:
           issue_title: ZAP Full Scan Report
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 3: Upload JSON, Markdown, and HTML reports
+      # Step 3: Upload reports as artifacts
       - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         with:
