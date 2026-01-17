@@ -1,0 +1,30 @@
+env:
+  contexts:
+    - name: "JuiceShop"
+      urls:
+        - "https://juice-shop.herokuapp.com"
+      includePaths:
+        - "https://juice-shop.herokuapp.com.*"
+      excludePaths:
+        - "https://juice-shop.herokuapp.com/logout.*"
+      authentication:
+        method: form
+        parameters:
+          loginPageUrl: "https://juice-shop.herokuapp.com/#/login"
+          loginRequestUrl: "https://juice-shop.herokuapp.com/rest/user/login"
+          loginRequestData: '{"email":"test@test.com ","password":"Test123"}'
+        verification:
+          loggedInRegex: "Logout"
+          loggedOutRegex: "Login"
+      users:
+        - name: "test"
+          credentials:
+            email: "test@test.com"
+            password: "Test123"
+
+jobs:
+  - type: spider
+    parameters:
+      context: "JuiceShop"
+      user: "test"
+  - type: passiveScan
