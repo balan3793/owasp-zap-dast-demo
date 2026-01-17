@@ -14,6 +14,7 @@ env:
           loginRequestUrl: "https://demo.testfire.net/login.jsp"
           loginRequestData: "username=admin&password=admin&btnSubmit=Login"
         verification:
+          method: regex
           loggedInRegex: "Log Out"
           loggedOutRegex: "Sign In"
       users:
@@ -38,18 +39,20 @@ jobs:
   - type: report
     parameters:
       template: traditional-html
-      reportFile: /zap/wrk/report.html
-      reportDir: /zap/wrk
+      reportFile: /zap/wrk/zap_reports/report.html
+      reportDir: /zap/wrk/zap_reports
       reportTitle: "Demo Test Fire Authenticated Scan"
+
   - type: report
     parameters:
       template: traditional-json
-      reportFile: /zap/wrk/report.json
-      reportDir: /zap/wrk
+      reportFile: /zap/wrk/zap_reports/report.json
+      reportDir: /zap/wrk/zap_reports
       reportTitle: "Demo Test Fire Authenticated Scan"
+
   - type: report
     parameters:
       template: traditional-md
-      reportFile: /zap/wrk/report.md
-      reportDir: /zap/wrk
+      reportFile: /zap/wrk/zap_reports/report.md
+      reportDir: /zap/wrk/zap_reports
       reportTitle: "Demo Test Fire Authenticated Scan"
