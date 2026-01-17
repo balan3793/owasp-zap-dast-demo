@@ -1,44 +1,35 @@
-name: OWASP ZAP Full Scan (Manual Docker)
+name: OWASP ZAP Full Scan (GHCR)
 
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
-  actions: write  # required for artifact upload
+  actions: write  # required to upload artifacts
 
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Prepare reports folder
       - name: Prepare Reports Folder
-        run: |
-          mkdir -p zap_reports
+        run: mkdir -p zap_reports
 
-      # Step 3: Pull ZAP Docker image
-      - name: Pull ZAP Docker Image
-        run: |
-          docker pull owasp/zap2docker-stable:latest
+      - name: Pull ZAP GHCR Image
+        run: docker pull ghcr.io/zaproxy/zaproxy:stable
 
-      # Step 4: Run ZAP Full Scan manually
       - name: Run ZAP Full Scan
         run: |
           docker run --rm -v $PWD/zap_reports:/zap/wrk \
-            owasp/zap2docker-stable \
-            zap-full-scan.py -t https://juice-shop.herokuapp.com -r /zap/wrk/report.html -f html
-          
-          # Move default output files (if any) to reports folder
-          mv report_json.json report_md.md report_html.html zap_reports/ 2>/dev/null || echo "Some reports not generated"
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-full-scan.py -t https://juice-shop.herokuapp.com \
+            -J /zap/wrk/report.json -w /zap/wrk/report.md -r /zap/wrk/report.html
 
-      # Step 5: Upload reports as artifacts
       - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         with:
-          name: zap_reports  # ✅ Safe artifact name
+          name: zap-reports
           path: zap_reports/
