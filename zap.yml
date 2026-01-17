@@ -40,20 +40,20 @@ jobs:
   - type: report
     parameters:
       template: traditional-html
-      reportFile: /zap/wrk/zap_reports/report.html
-      reportDir: /zap/wrk/zap_reports
+      reportFile: zap_reports/report.html
+      reportDir: zap_reports
       reportTitle: "Demo Test Fire Authenticated Scan"
 
   - type: report
     parameters:
       template: traditional-json
-      reportFile: /zap/wrk/zap_reports/report.json
-      reportDir: /zap/wrk/zap_reports
+      reportFile: zap_reports/report.json
+      reportDir: zap_reports
       reportTitle: "Demo Test Fire Authenticated Scan"
 
   - type: report
     parameters:
       template: traditional-md
-      reportFile: /zap/wrk/zap_reports/report.md
-      reportDir: /zap/wrk/zap_reports
+      reportFile: zap_reports/report.md
+      reportDir: zap_reports
       reportTitle: "Demo Test Fire Authenticated Scan"
