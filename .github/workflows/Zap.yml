@@ -1,13 +1,9 @@
 name: ZAP Full Scan
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
   schedule:
-    # Runs every night at 2 AM UTC (adjust as needed)
-    - cron: "0 2 * * *"
+    - cron: "0 2 * * *"   # nightly at 2 AM UTC
 
 permissions:
   contents: read
@@ -26,7 +22,7 @@ jobs:
         uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: https://juice-shop.herokuapp.com
-          cmd_options: -c /zap/wrk/zap.yml
+          cmd_options: -c /zap/wrk/zap.yaml
           fail_action: false
           allow_issue_writing: false
           issue_title: ZAP Full Scan Report
