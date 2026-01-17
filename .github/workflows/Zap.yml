@@ -3,6 +3,9 @@ name: OWASP ZAP Baseline Scan
 on:
   workflow_dispatch:
 
+permissions:
+  issues: write   # allow ZAP to create issues
+
 jobs:
   zap_job:
     runs-on: ubuntu-latest
@@ -15,3 +18,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: 'https://juice-shop.herokuapp.com'
+          cmd_options: '-a'
+          artifact_name: ''
+          allow_issue_writing: true
+          fail_action: false
