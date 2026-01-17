@@ -1,11 +1,11 @@
-name: OWASP ZAP Full Scan
+name: OWASP ZAP Full Scan (Manual Docker)
 
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
-  actions: write  # ✅ Required to upload artifacts
+  actions: write  # required for artifact upload
 
 jobs:
   zap_scan:
@@ -16,25 +16,29 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Run ZAP Full Scan
-      - name: Run OWASP ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.7.0
-        with:
-          target: 'https://juice-shop.herokuapp.com'
-          cmd_options: '-c /zap/wrk/zap.yml'
-          fail_action: false
-          allow_issue_writing: false
-          issue_title: 'ZAP Full Scan Report'
-
-      # Step 3: Create safe folder for reports
-      - name: Prepare Report Folder
+      # Step 2: Prepare reports folder
+      - name: Prepare Reports Folder
         run: |
           mkdir -p zap_reports
-          mv report_json.json report_md.md report_html.html zap_reports/ || echo "No reports generated"
 
-      # Step 4: Upload reports as artifacts
+      # Step 3: Pull ZAP Docker image
+      - name: Pull ZAP Docker Image
+        run: |
+          docker pull owasp/zap2docker-stable:latest
+
+      # Step 4: Run ZAP Full Scan manually
+      - name: Run ZAP Full Scan
+        run: |
+          docker run --rm -v $PWD/zap_reports:/zap/wrk \
+            owasp/zap2docker-stable \
+            zap-full-scan.py -t https://juice-shop.herokuapp.com -r /zap/wrk/report.html -f html
+          
+          # Move default output files (if any) to reports folder
+          mv report_json.json report_md.md report_html.html zap_reports/ 2>/dev/null || echo "Some reports not generated"
+
+      # Step 5: Upload reports as artifacts
       - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         with:
-          name: zap_reports  # ✅ Safe artifact name (letters/underscore only)
+          name: zap_reports  # ✅ Safe artifact name
           path: zap_reports/
