@@ -3,6 +3,9 @@ name: OWASP ZAP Baseline Scan
 on:
   workflow_dispatch:
 
+permissions:
+  issues: write  # ✅ This line gives permission to create issues
+
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
