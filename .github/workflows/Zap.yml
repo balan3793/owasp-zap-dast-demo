@@ -15,9 +15,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Run ZAP Full Scan (latest Action, no Docker Hub needed)
+      # Step 2: Run ZAP Full Scan (latest Action)
       - name: Run ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.6.0
+        uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: https://juice-shop.herokuapp.com
           cmd_options: -c /zap/wrk/zap.yml
