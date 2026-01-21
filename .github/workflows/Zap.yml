@@ -1,7 +1,4 @@
-name: OWASP ZAP Baseline Scan
-on:
-  workflow_dispatch:
-jobs:
+
 name: OWASP ZAP Scan with Report Artifact
 on:
   workflow_dispatch:
@@ -20,6 +17,6 @@ jobs:
         with:
           target: 'https://juice-shop.herokuapp.com'
           cmd_options: '-a'
-          artifact_name: 'zap_report'   Safe artifact name
+          artifact_name: 'zap_report'  #Safe artifact name
           fail_action: false           #Prevents workflow failure on alerts
           allow_issue_writing: false   # Avoids issue creation permission errors
