@@ -1,7 +1,7 @@
-name: OWASP ZAP Authenticated Scan
+name: OWASP ZAP DAST Scan
 
 on:
-  workflow_dispatch:   # run manually from Actions tab
+  workflow_dispatch:   # run manually
   push:
     branches:
       - main
@@ -9,10 +9,10 @@ on:
 
 permissions:
   contents: read
-  issues: write   # needed to create issues
+  issues: write
 
 jobs:
-  zap_auth_scan:
+  zap_dast_scan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
       - name: Upload Reports
         uses: actions/upload-artifact@v4
         with:
-          name: zap-auth-reports
+          name: zap-dast-reports
           path: zap_reports
 
       - name: Show Markdown Summary
@@ -47,7 +47,7 @@ jobs:
           HIGH=$(grep -c "High" zap_reports/report.md || true)
           if [ "$HIGH" -gt 0 ]; then
             gh issue create \
-              --title "ZAP Authenticated Scan found $HIGH High Severity Alerts" \
+              --title "ZAP DAST Scan found $HIGH High Severity Alerts" \
               --body "$(cat zap_reports/report.md)" \
               --label "security"
           else
