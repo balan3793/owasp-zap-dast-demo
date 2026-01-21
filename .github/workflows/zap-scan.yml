@@ -1,53 +1,61 @@
-name: OWASP ZAP DAST
+name: OWASP ZAP Combined Scan
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
   contents: read
-  issues: write   # needed to create issues
+  issues: write
 
 jobs:
-  zap_full:
+  baseline_scan:
+    name: ZAP Baseline (Passive)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: ZAP Full Scan
-        id: zap
-        uses: zaproxy/action-full-scan@v0.1.0
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
         with:
           target: "http://testphp.vulnweb.com/"
-          cmd_options: "-a -j -I"
-          output_dir: zap_reports
+          cmd_options: "-a -I"
+          rules_file_name: ""   # drop if you don’t have rules.tsv
 
-      # Show Markdown summary inline in logs
-      - name: Display Markdown Report
+      - name: Upload Baseline Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-reports
+          path: .
+
+  full_scan:
+    name: ZAP Full Scan (Active)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ZAP Full Scan via Docker
         run: |
-          echo "### OWASP ZAP Markdown Report"
-          cat zap_reports/report_md.md || echo "No markdown report found"
+          docker run --rm -v $(pwd):/zap/wrk/:rw \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-full-scan.py \
+              -t http://testphp.vulnweb.com/ \
+              -J report_json.json \
+              -w report_md.md \
+              -r report_html.html \
+              -x report_xml.xml \
+              -a -j -I
 
-      # Upload all reports (HTML, MD, JSON, XML)
-      - name: Upload ZAP Reports
+      - name: Show Full Scan Markdown Report
+        run: |
+          echo "### OWASP ZAP Full Scan Report"
+          cat report_md.md || echo "No markdown report found"
+
+      - name: Upload Full Scan Reports
         uses: actions/upload-artifact@v4
         with:
           name: zap-full-reports
-          path: zap_reports
-
-      # Auto-create GitHub Issue if high alerts are found
-      - name: Create Issue for High Alerts
-        if: always()
-        run: |
-          HIGH=$(grep -c "High" zap_reports/report_md.md || true)
-          if [ "$HIGH" -gt 0 ]; then
-            echo "High severity issues found: $HIGH"
-            gh issue create \
-              --title "ZAP Scan found $HIGH High Severity Alerts" \
-              --body "$(cat zap_reports/report_md.md)" \
-              --label "security"
-          else
-            echo "No high severity issues found."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: .
