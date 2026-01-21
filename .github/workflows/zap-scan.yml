@@ -24,7 +24,7 @@ jobs:
             -v ${{ github.workspace }}:/zap/wrk/:rw \
             --network=host \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-automation.py -autorun /zap/wrk/.zap.yaml
+            python3 /zap/zap-automation.py -autorun /zap/wrk/.zap.yaml
 
       - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
