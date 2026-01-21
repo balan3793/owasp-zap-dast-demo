@@ -1,38 +1,38 @@
-name: OWASP ZAP Automation Framework Scan
-
+name: OWASP ZAP Integration with GitHub Actions
 on:
+  push:
+    branches:
+      - main 
+      - master
   workflow_dispatch:
-
+    inputs:
+      target:
+        description: "Target URL to scan"
+        required: true
+        default: "http://testphp.vulnweb.com/"
+      rules_file_name:
+        description: "Path to rules.tsv (optional)"
+        required: false
+        default: ".zap/rules.tsv"
+      aggressive:
+        description: "Add '-a' to aggressively spider"
+        required: false
+        default: "true"
 permissions:
   contents: read
-  actions: write
-
+  issues: write  
 jobs:
-  zap:
+  zap_scan:
+    name: Scan the web application
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Prepare report directory
-        run: mkdir -p zap_reports
-
-      - name: Run OWASP ZAP Automation Framework
-        run: |
-          docker run \
-            -v ${{ github.workspace }}:/zap/wrk/:rw \
-            --network=host \
-            ghcr.io/zaproxy/zaproxy:stable \
-            python3 /zap/zap-automation.py -autorun /zap/wrk/.zap.yaml
-
-      - name: Upload ZAP Reports
-        uses: actions/upload-artifact@v4
         with:
-          name: zap_reports
-          path: zap_reports/
-
-      - name: Show Markdown Report in logs
-        run: |
-          echo "===== ZAP Markdown Report ====="
-          cat zap_reports/report.md || echo "No Markdown report found!"
+          ref: master
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ github.event.inputs.target || 'http://testphp.vulnweb.com/' }}
+          rules_file_name: ${{ github.event.inputs.rules_file_name || '.zap/rules.tsv' }}
+          cmd_options: ${{ github.event.inputs.aggressive == 'true' && '-a' || '' }}
