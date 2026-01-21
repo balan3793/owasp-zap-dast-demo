@@ -1,7 +1,7 @@
-name: OWASP ZAP DAST Scan
+name: OWASP ZAP Full Scan
 
 on:
-  workflow_dispatch:   # run manually
+  workflow_dispatch:   # run manually from Actions tab
   push:
     branches:
       - main
@@ -9,49 +9,21 @@ on:
 
 permissions:
   contents: read
-  issues: write
+  actions: write   # Required to upload artifacts
+  issues: write    # Optional, if you want auto issue creation
 
 jobs:
-  zap_dast_scan:
+  zap_full_scan:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare Folders
-        run: |
-          mkdir -p zap_home zap_reports
-          cp .zap.yml zap_plan.yaml
-
-      - name: Run ZAP Automation Plan
-        run: |
-          docker run --rm -u $(id -u):$(id -g) \
-            -v $(pwd)/zap_home:/zap/home:rw \
-            -v $(pwd)/zap_reports:/zap/wrk:rw \
-            -e ZAP_HOME=/zap/home \
-            ghcr.io/zaproxy/zaproxy:stable \
-            zap.sh -autorun /zap/wrk/zap_plan.yaml
-
-      - name: Upload Reports
-        uses: actions/upload-artifact@v4
+      - name: Run OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.14.0
         with:
-          name: zap-dast-reports
-          path: zap_reports
-
-      - name: Show Markdown Summary
-        run: cat zap_reports/report.md || echo "No markdown report found"
-
-      - name: Create GitHub Issue for High Alerts
-        if: always()
-        run: |
-          HIGH=$(grep -c "High" zap_reports/report.md || true)
-          if [ "$HIGH" -gt 0 ]; then
-            gh issue create \
-              --title "ZAP DAST Scan found $HIGH High Severity Alerts" \
-              --body "$(cat zap_reports/report.md)" \
-              --label "security"
-          else
-            echo "No high severity issues found."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://testphp.vulnweb.com'
+          cmd_options: '-a -j -I'
+          artifact_name: 'zap_full_report'
+          fail_action: false
+          allow_issue_writing: false   # set true if you want ZAP to auto-create GitHub issues
