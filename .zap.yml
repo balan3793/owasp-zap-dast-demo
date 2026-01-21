@@ -3,10 +3,6 @@ env:
     - name: "TestPHP"
       urls:
         - "http://testphp.vulnweb.com"
-      includePaths:
-        - "http://testphp.vulnweb.com.*"
-      excludePaths:
-        - "http://testphp.vulnweb.com/logout.*"
       authentication:
         method: form
         parameters:
