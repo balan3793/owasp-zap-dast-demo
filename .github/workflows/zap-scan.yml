@@ -1,8 +1,9 @@
 name: OWASP ZAP Integration with GitHub Actions
+
 on:
   push:
     branches:
-      - main 
+      - main
       - master
   workflow_dispatch:
     inputs:
@@ -18,9 +19,11 @@ on:
         description: "Add '-a' to aggressively spider"
         required: false
         default: "true"
+
 permissions:
   contents: read
-  issues: write  
+  issues: write
+
 jobs:
   zap_scan:
     name: Scan the web application
@@ -29,10 +32,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: ${{ github.ref_name }}
+
       - name: ZAP Baseline Scan
+        id: zap
         uses: zaproxy/action-baseline@v0.14.0
         with:
           target: ${{ github.event.inputs.target || 'http://testphp.vulnweb.com/' }}
           rules_file_name: ${{ github.event.inputs.rules_file_name || '.zap/rules.tsv' }}
           cmd_options: ${{ github.event.inputs.aggressive == 'true' && '-a' || '' }}
+          output_dir: zap_reports
+
+      # Show Markdown summary directly in logs
+      - name: Display Markdown Report
+        run: |
+          echo "### OWASP ZAP Markdown Report"
+          cat zap_reports/report.md
+
+      # Upload all reports (HTML, MD, JSON, XML)
+      - name: Upload ZAP Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-scan-reports
+          path: zap_reports
+
+      # Optional: Create GitHub Issue if high-risk alerts are found
+      - name: Create Issue for High Alerts
+        if: always()
+        run: |
+          HIGH=$(grep -c "High" zap_reports/report.md || true)
+          if [ "$HIGH" -gt 0 ]; then
+            echo "High severity issues found: $HIGH"
+            gh issue create \
+              --title "ZAP Scan found $HIGH High Severity Alerts" \
+              --body "$(cat zap_reports/report.md)" \
+              --label "security"
+          else
+            echo "No high severity issues found."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
