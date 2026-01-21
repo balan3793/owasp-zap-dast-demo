@@ -1,84 +1,53 @@
-name: OWASP ZAP Combined Scan
+name: OWASP ZAP DAST
 
 on:
-  push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
-    inputs:
-      target:
-        description: "Target URL to scan"
-        required: true
-        default: "http://testphp.vulnweb.com/"
-      rules_file_name:
-        description: "Path to rules.tsv (optional)"
-        required: false
-        default: ".zap/rules.tsv"
-      aggressive:
-        description: "Add '-a' to aggressively spider"
-        required: false
-        default: "true"
 
 permissions:
   contents: read
-  issues: write
+  issues: write   # needed to create issues
 
 jobs:
-  baseline_scan:
-    name: ZAP Baseline (Passive)
+  zap_full:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: ZAP Baseline Scan
-        id: zap-baseline
-        uses: zaproxy/action-baseline@v0.14.0
-        with:
-          target: ${{ github.event.inputs.target }}
-          rules_file_name: ${{ github.event.inputs.rules_file_name }}
-          cmd_options: ${{ github.event.inputs.aggressive == 'true' && '-a' || '' }}
-          output_dir: zap_reports_baseline
-
-      - name: Show Baseline Markdown Report
-        run: |
-          echo "### OWASP ZAP Baseline Report"
-          cat zap_reports_baseline/report_md.md || echo "No baseline markdown report found"
-
-      - name: Upload Baseline Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-baseline-reports
-          path: zap_reports_baseline
-
-  full_scan:
-    name: ZAP Full Scan (Active)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
 
       - name: ZAP Full Scan
-        id: zap-full
+        id: zap
         uses: zaproxy/action-full-scan@v0.14.0
         with:
-          target: ${{ github.event.inputs.target }}
-          rules_file_name: ${{ github.event.inputs.rules_file_name }}
-          cmd_options: ${{ github.event.inputs.aggressive == 'true' && '-a' || '' }}
-          output_dir: zap_reports_full
+          target: "http://testphp.vulnweb.com/"
+          cmd_options: "-a -j -I"
+          output_dir: zap_reports
 
-      - name: Show Full Scan Markdown Report
+      # Show Markdown summary inline in logs
+      - name: Display Markdown Report
         run: |
-          echo "### OWASP ZAP Full Scan Report"
-          cat zap_reports_full/report_md.md || echo "No full scan markdown report found"
+          echo "### OWASP ZAP Markdown Report"
+          cat zap_reports/report_md.md || echo "No markdown report found"
 
-      - name: Upload Full Scan Reports
+      # Upload all reports (HTML, MD, JSON, XML)
+      - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         with:
           name: zap-full-reports
-          path: zap_reports_full
+          path: zap_reports
+
+      # Auto-create GitHub Issue if high alerts are found
+      - name: Create Issue for High Alerts
+        if: always()
+        run: |
+          HIGH=$(grep -c "High" zap_reports/report_md.md || true)
+          if [ "$HIGH" -gt 0 ]; then
+            echo "High severity issues found: $HIGH"
+            gh issue create \
+              --title "ZAP Scan found $HIGH High Severity Alerts" \
+              --body "$(cat zap_reports/report_md.md)" \
+              --label "security"
+          else
+            echo "No high severity issues found."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
