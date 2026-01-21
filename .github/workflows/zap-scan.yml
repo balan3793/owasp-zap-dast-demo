@@ -1,4 +1,4 @@
-name: OWASP ZAP Full Scan with Report Artifact
+name: OWASP ZAP Automation Scan with Reports
 
 on:
   workflow_dispatch:
@@ -18,12 +18,14 @@ jobs:
       - name: Prepare report directory
         run: mkdir -p zap_reports
 
-      - name: Run OWASP ZAP Full Scan
+      - name: Run OWASP ZAP Automation Scan
         uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: 'http://testphp.vulnweb.com'
-          cmd_options: "-configfile .zap.yaml"
-          artifact_name: 'zap_report'
+          # ✅ use zap-automation.py instead of zap-full-scan.py
+          cmd_options: >
+            -cmd -autorun /zap/wrk/.zap.yaml
+          artifact_name: 'zap_reports'
           fail_action: false
 
       - name: Upload ZAP Reports
@@ -32,7 +34,7 @@ jobs:
           name: zap_reports
           path: zap_reports/
 
-      - name: Show ZAP Markdown Report in logs
+      - name: Show Markdown Report in logs
         run: |
           echo "===== ZAP Markdown Report ====="
           cat zap_reports/report.md || echo "No Markdown report found!"
