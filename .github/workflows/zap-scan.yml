@@ -1,16 +1,11 @@
 name: OWASP ZAP Full Scan
 
 on:
-  workflow_dispatch:   # run manually from Actions tab
-  push:
-    branches:
-      - main
-      - master
+  workflow_dispatch:
 
 permissions:
   contents: read
-  actions: write   # Required to upload artifacts
-  issues: write    # Optional, if you want auto issue creation
+  actions: write
 
 jobs:
   zap_full_scan:
@@ -19,11 +14,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare Reports Folder
+        run: mkdir -p zap_reports
+
       - name: Run OWASP ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.14.0
+        run: |
+          docker run --rm -u $(id -u):$(id -g) \
+            -v $(pwd)/zap_reports:/zap/wrk:rw \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-full-scan.py \
+              -t http://testphp.vulnweb.com \
+              -J report.json \
+              -w report.md \
+              -r report.html \
+              -x report.xml \
+              -a -j -I
+
+      - name: Upload Reports
+        uses: actions/upload-artifact@v4
         with:
-          target: 'http://testphp.vulnweb.com'
-          cmd_options: '-a -j -I'
-          artifact_name: 'zap_full_report'
-          fail_action: false
-          allow_issue_writing: false   # set true if you want ZAP to auto-create GitHub issues
+          name: zap-full-reports
+          path: zap_reports
