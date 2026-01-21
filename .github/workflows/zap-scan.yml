@@ -1,7 +1,11 @@
 name: OWASP ZAP Full Scan
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # run manually from Actions tab
+  push:
+    branches:
+      - main
+      - master
 
 permissions:
   contents: read
@@ -35,3 +39,6 @@ jobs:
         with:
           name: zap-full-reports
           path: zap_reports
+
+      - name: Show Markdown Summary
+        run: cat zap_reports/report.md || echo "No markdown report found"
