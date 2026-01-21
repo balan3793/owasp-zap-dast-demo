@@ -1,7 +1,7 @@
 name: OWASP ZAP Full Scan
 
 on:
-  workflow_dispatch:   # run manually from Actions tab
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -9,11 +9,11 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   zap_full_scan:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
 
       - name: Run OWASP ZAP Full Scan
         run: |
-          docker run --rm -u $(id -u):$(id -g) \
+          docker run --rm \
             -v $(pwd)/zap_reports:/zap/wrk:rw \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-full-scan.py \
@@ -32,7 +32,8 @@ jobs:
               -w report.md \
               -r report.html \
               -x report.xml \
-              -a -j -I
+              -a -j -I \
+              -z "-Xmx1024m"
 
       - name: Upload Reports
         uses: actions/upload-artifact@v4
@@ -41,4 +42,6 @@ jobs:
           path: zap_reports
 
       - name: Show Markdown Summary
-        run: cat zap_reports/report.md || echo "No markdown report found"
+        run: |
+          echo "===== ZAP SUMMARY ====="
+          cat zap_reports/report.md || echo "No markdown report found"
