@@ -1,10 +1,12 @@
-
 name: OWASP ZAP Scan with Report Artifact
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: read
-  actions: write  Required to upload artifacts
+  actions: write   # Required to upload artifacts
+
 jobs:
   zap:
     runs-on: ubuntu-latest
@@ -12,11 +14,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
           target: 'https://juice-shop.herokuapp.com'
           cmd_options: '-a'
-          artifact_name: 'zap_report'  #Safe artifact name
-          fail_action: false           #Prevents workflow failure on alerts
-          allow_issue_writing: false   # Avoids issue creation permission errors
+          artifact_name: 'zap_report'   # Safe artifact name
+          fail_action: false            # Prevents workflow failure on alerts
+          allow_issue_writing: false    # Avoids issue creation permission errors
