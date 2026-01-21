@@ -1,59 +1,25 @@
-env:
-  contexts:
-    - name: "TestPHP"
-      urls:
-        - "http://testphp.vulnweb.com"
-      includePaths:
-        - "http://testphp.vulnweb.com.*"
-      excludePaths:
-        - "http://testphp.vulnweb.com/logout.*"
-      authentication:
-        method: form
-        parameters:
-          loginPageUrl: "http://testphp.vulnweb.com/login.php"
-          loginRequestUrl: "http://testphp.vulnweb.com/login.php"
-          loginRequestData: "uname=test&pass=test&btnLogin=Login"
-        verification:
-          method: poll
-          pollUrl: "http://testphp.vulnweb.com/"
-          pollFrequency: 2
-          pollUnits: requests
-          loggedInRegex: "Logout"
-          loggedOutRegex: "Login"
-      users:
-        - name: "testuser"
-          credentials:
-            username: "test"
-            password: "test"
-
+name: OWASP ZAP Baseline Scan
+on:
+  workflow_dispatch:
 jobs:
-  - type: spider
-    parameters:
-      context: "TestPHP"
-      user: "testuser"
+name: OWASP ZAP Scan with Report Artifact
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write  Required to upload artifacts
+jobs:
+  zap:
+    runs-on: ubuntu-latest
 
-  - type: activeScan
-    parameters:
-      context: "TestPHP"
-      user: "testuser"
-
-  - type: report
-    parameters:
-      template: traditional-html
-      reportFile: zap_reports/report.html
-      reportDir: zap_reports
-      reportTitle: "TestPHP Authenticated Scan"
-
-  - type: report
-    parameters:
-      template: traditional-json
-      reportFile: zap_reports/report.json
-      reportDir: zap_reports
-      reportTitle: "TestPHP Authenticated Scan"
-
-  - type: report
-    parameters:
-      template: traditional-md
-      reportFile: zap_reports/report.md
-      reportDir: zap_reports
-      reportTitle: "TestPHP Authenticated Scan"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: 'https://juice-shop.herokuapp.com'
+          cmd_options: '-a'
+          artifact_name: 'zap_report'   Safe artifact name
+          fail_action: false           #Prevents workflow failure on alerts
+          allow_issue_writing: false   # Avoids issue creation permission errors
