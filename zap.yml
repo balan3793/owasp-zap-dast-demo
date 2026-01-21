@@ -1,59 +1,59 @@
 env:
   contexts:
-    - name: "TestFire"
+    - name: "TestPHP"
       urls:
-        - "https://demo.testfire.net"
+        - "http://testphp.vulnweb.com"
       includePaths:
-        - "https://demo.testfire.net.*"
+        - "http://testphp.vulnweb.com.*"
       excludePaths:
-        - "https://demo.testfire.net/logout.*"
+        - "http://testphp.vulnweb.com/logout.*"
       authentication:
         method: form
         parameters:
-          loginPageUrl: "https://demo.testfire.net/login.jsp"
-          loginRequestUrl: "https://demo.testfire.net/login.jsp"
-          loginRequestData: "username=admin&password=admin&btnSubmit=Login"
+          loginPageUrl: "http://testphp.vulnweb.com/login.php"
+          loginRequestUrl: "http://testphp.vulnweb.com/login.php"
+          loginRequestData: "uname=test&pass=test&btnLogin=Login"
         verification:
           method: poll
-          pollUrl: "https://demo.testfire.net/bank/main.jsp"
+          pollUrl: "http://testphp.vulnweb.com/"
           pollFrequency: 2
           pollUnits: requests
-          loggedInRegex: "Log Out"
-          loggedOutRegex: "Sign In"
+          loggedInRegex: "Logout"
+          loggedOutRegex: "Login"
       users:
-        - name: "adminuser"
+        - name: "testuser"
           credentials:
-            username: "admin"
-            password: "admin"
+            username: "test"
+            password: "test"
 
 jobs:
   - type: spider
     parameters:
-      context: "TestFire"
-      user: "adminuser"
+      context: "TestPHP"
+      user: "testuser"
 
   - type: activeScan
     parameters:
-      context: "TestFire"
-      user: "adminuser"
+      context: "TestPHP"
+      user: "testuser"
 
   - type: report
     parameters:
       template: traditional-html
       reportFile: zap_reports/report.html
       reportDir: zap_reports
-      reportTitle: "Demo Test Fire Authenticated Scan"
+      reportTitle: "TestPHP Authenticated Scan"
 
   - type: report
     parameters:
       template: traditional-json
       reportFile: zap_reports/report.json
       reportDir: zap_reports
-      reportTitle: "Demo Test Fire Authenticated Scan"
+      reportTitle: "TestPHP Authenticated Scan"
 
   - type: report
     parameters:
       template: traditional-md
       reportFile: zap_reports/report.md
       reportDir: zap_reports
-      reportTitle: "Demo Test Fire Authenticated Scan"
+      reportTitle: "TestPHP Authenticated Scan"
