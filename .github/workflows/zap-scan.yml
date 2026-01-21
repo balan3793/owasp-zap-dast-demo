@@ -2,10 +2,14 @@ name: OWASP ZAP Authenticated Scan
 
 on:
   workflow_dispatch:   # run manually from Actions tab
+  push:
+    branches:
+      - main
+      - master
 
 permissions:
   contents: read
-  issues: write
+  issues: write   # needed to create issues
 
 jobs:
   zap_auth_scan:
@@ -14,17 +18,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare Reports Folder
-        run: mkdir -p zap_reports
+      - name: Prepare Folders
+        run: |
+          mkdir -p zap_home zap_reports
+          cp .zap.yml zap_plan.yaml
 
       - name: Run ZAP Automation Plan
         run: |
-          # Copy your automation plan into the workspace
-          cp .zap.yml zap_plan.yaml
-
-          # Run ZAP with the automation plan
           docker run --rm -u $(id -u):$(id -g) \
-            -v $(pwd):/zap/wrk/:rw \
+            -v $(pwd)/zap_home:/zap/home:rw \
+            -v $(pwd)/zap_reports:/zap/wrk:rw \
+            -e ZAP_HOME=/zap/home \
             ghcr.io/zaproxy/zaproxy:stable \
             zap.sh -autorun /zap/wrk/zap_plan.yaml
 
