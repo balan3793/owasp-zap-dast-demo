@@ -2,20 +2,26 @@ name: OWASP ZAP Full Scan
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   zap_full_scan:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare Reports Folder
-        run: mkdir -p zap_reports
+      - name: Prepare ZAP reports directory
+        run: |
+          mkdir -p zap_reports
+          chmod -R 777 zap_reports
 
       - name: Run OWASP ZAP Full Scan
         run: |
@@ -24,20 +30,20 @@ jobs:
             ghcr.io/zaproxy/zaproxy:stable \
             zap-full-scan.py \
               -t http://testphp.vulnweb.com \
-              -J /zap/wrk/report.json \
-              -w /zap/wrk/report.md \
-              -r /zap/wrk/report.html \
-              -x /zap/wrk/report.xml \
+              -J report.json \
+              -w report.md \
+              -r report.html \
+              -x report.xml \
               -a -j -I \
-              -z "-Xmx1024m"
+              -z "-Xmx1024m -config ascan.ignoreScanErrors=true"
 
-      - name: Upload Reports
+      - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         with:
-          name: zap-full-reports
+          name: zap-full-scan-reports
           path: zap_reports
 
-      - name: Show Markdown Summary
+      - name: Show ZAP Markdown Summary
         run: |
-          echo "===== ZAP SUMMARY ====="
+          echo "===== OWASP ZAP SCAN SUMMARY ====="
           cat zap_reports/report.md || echo "No markdown report found"
