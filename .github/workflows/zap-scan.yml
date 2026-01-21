@@ -1,4 +1,4 @@
-name: OWASP ZAP Automation Scan with Reports
+name: OWASP ZAP Automation Scan
 
 on:
   workflow_dispatch:
@@ -22,7 +22,7 @@ jobs:
         uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: 'http://testphp.vulnweb.com'
-          # ✅ use zap-automation.py instead of zap-full-scan.py
+          # ✅ Run zap-automation.py with your automation plan
           cmd_options: >
             -cmd -autorun /zap/wrk/.zap.yaml
           artifact_name: 'zap_reports'
