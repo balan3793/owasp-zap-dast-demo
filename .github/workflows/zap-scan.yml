@@ -2,18 +2,14 @@ name: OWASP ZAP Full Scan
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - master
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   zap_full_scan:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,10 +24,10 @@ jobs:
             ghcr.io/zaproxy/zaproxy:stable \
             zap-full-scan.py \
               -t http://testphp.vulnweb.com \
-              -J report.json \
-              -w report.md \
-              -r report.html \
-              -x report.xml \
+              -J /zap/wrk/report.json \
+              -w /zap/wrk/report.md \
+              -r /zap/wrk/report.html \
+              -x /zap/wrk/report.xml \
               -a -j -I \
               -z "-Xmx1024m"
 
